@@ -6,6 +6,7 @@ export default [
     "url": "https://www.bok.net/dash/tears_of_steel/cleartext/stream.mpd",
     "transport": "dash",
     "live": false,
+    "enableVideoThumbnails": true,
   },
   {
     "name": "Tears of Steel (DRM Widevine)",
@@ -103,6 +104,7 @@ export default [
     "url": "https://download.tsi.telecom-paristech.fr/gpac/DASH_CONFORMANCE/TelecomParisTech/mp4-live-periods/mp4-live-periods-mpd.mpd",
     "transport": "dash",
     "live": false,
+    "enableVideoThumbnails": true,
   },
   {
     "name": "Big Buck Bunny WEBM",
