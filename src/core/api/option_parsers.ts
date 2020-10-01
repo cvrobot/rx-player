@@ -28,6 +28,7 @@ import {
   ITransportOptions as IParsedTransportOptions,
 } from "../../transports";
 import isNullOrUndefined from "../../utils/is_null_or_undefined";
+import arrayIncludes from "../../utils/array_includes";
 import {
   normalizeAudioTrack,
   normalizeTextTrack,
@@ -46,6 +47,7 @@ const { DEFAULT_AUTO_PLAY,
         DEFAULT_INITIAL_BITRATES,
         DEFAULT_LIMIT_VIDEO_WIDTH,
         DEFAULT_MANUAL_BITRATE_SWITCHING_MODE,
+        DEFAULT_AUDIO_TRACK_SWITCHING_MODE,
         DEFAULT_MAX_BITRATES,
         DEFAULT_MAX_BUFFER_AHEAD,
         DEFAULT_MAX_BUFFER_BEHIND,
@@ -92,6 +94,8 @@ export interface ITransportOptions {
   referenceDateTime? : number;
   /** Allows to synchronize the server's time with the client's. */
   serverSyncInfos? : IServerSyncInfos;
+  /** Allows to adapt the switching audio logic depending on the application's choice. */
+  audioTrackSwitchingMode?: "smooth" | "flush" | "reload";
 }
 
 /**
@@ -270,6 +274,7 @@ interface IParsedLoadVideoOptionsBase {
   startAt : IParsedStartAtOption|undefined;
   manualBitrateSwitchingMode : "seamless"|"direct";
   enableFastSwitching : boolean;
+  audioTrackSwitchingMode : "smooth" | "flush" | "reload";
 }
 
 /**
@@ -550,6 +555,16 @@ function parseLoadVideoOptions(
   const manifestUpdateUrl = options.transportOptions?.manifestUpdateUrl;
   const minimumManifestUpdateInterval =
     options.transportOptions?.minimumManifestUpdateInterval ?? 0;
+  let audioTrackSwitchingMode = options.transportOptions?.audioTrackSwitchingMode ??
+                                DEFAULT_AUDIO_TRACK_SWITCHING_MODE;
+  if (!arrayIncludes(["smooth", "flush", "reload"], audioTrackSwitchingMode)) {
+    warnOnce("The `audioTrackSwitchingMode` loadVideo option must match one of the following strategy name:\n" +
+             "- `smooth`\n" +
+             "- `flush`\n" +
+             "- `reload`\n" +
+             "If badly set, `smooth` strategy will be used as default");
+    audioTrackSwitchingMode = DEFAULT_AUDIO_TRACK_SWITCHING_MODE;
+  }
 
   const transportOptions = objectAssign({}, transportOptsArg, {
     /* tslint:disable deprecation */
@@ -679,6 +694,7 @@ function parseLoadVideoOptions(
            keySystems,
            lowLatencyMode,
            manualBitrateSwitchingMode,
+           audioTrackSwitchingMode,
            manifestUpdateUrl,
            minimumManifestUpdateInterval,
            networkConfig,

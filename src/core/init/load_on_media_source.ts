@@ -174,6 +174,15 @@ export default function createMediaSourceLoader({
               handleDiscontinuity(gap[1], mediaElement);
             }
             return EMPTY;
+          case "addedSegmentOnAdaptationChange":
+            const { audioTrackSwitchingMode } = bufferOptions;
+            if (audioTrackSwitchingMode === "flush" &&
+                evt.value.type === "audio" &&
+                mediaElement.currentTime + 0.001 < mediaElement.duration
+                ) {
+                  mediaElement.currentTime += 0.001;
+                }
+            return EMPTY;
           default:
             return observableOf(evt);
         }

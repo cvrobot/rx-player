@@ -153,6 +153,18 @@ export interface IAdaptationStreamOptions {
    * those devices.
    */
   enableFastSwitching : boolean;
+   /** 
+    * Strategy when switching of audio track:
+    *  - "smooth": This is the default behavior, it allows you to switch "smoothly" 
+    *  to the wanted audio adaptation, in some cases the switch can take up to 2 sec.
+    *  - "flush": By using flush, we will take care of flushing the audio source buffer
+    *  by performing a very small seek in order to switch to the wanted audio adaptation.
+    *  Permit to switch faster but could look aggressive during the video playback.
+    *  - "reload": The reload strategies, however, allows you to reload the whole media source.
+    *  It is instant but a small reload will appear on the screen since we destroy the
+    *  source buffer and build it again from scratch.
+   */
+   audioTrackSwitchingMode : "smooth" | "flush" | "reload";
 }
 
 /**

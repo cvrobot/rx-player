@@ -200,6 +200,18 @@ export interface IAdaptationChangeEvent {
      */
     adaptation : Adaptation |
                  null;
+    /**
+     * Tell if its the first adaptation to be chosen when loadVideo is fired.
+     */
+    isFirstAdaptation : boolean;
+  };
+}
+
+export interface IAddedSegmentOnAdaptationChange {
+  type : "addedSegmentOnAdaptationChange";
+  value : {
+    /** The type of buffer for which the Representation is changing. */
+    type: IBufferType;
   };
 }
 
@@ -368,7 +380,8 @@ export interface INeedsDecipherabilityFlush {
 export type IPeriodStreamEvent = IPeriodStreamReadyEvent |
                                  IAdaptationStreamEvent<unknown> |
                                  INeedsMediaSourceReload |
-                                 IAdaptationChangeEvent;
+                                 IAdaptationChangeEvent |
+                                 IAddedSegmentOnAdaptationChange;
 
 /** Event coming from function(s) managing multiple PeriodStreams. */
 export type IMultiplePeriodStreamsEvent = IPeriodStreamEvent |

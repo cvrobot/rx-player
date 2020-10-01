@@ -112,6 +112,8 @@ export interface IInitializeArguments {
      * higher-quality ones to have a faster transition.
      */
     enableFastSwitching : boolean;
+    /** Stategy when switching of audio track (smooth vs flush vs reload). */
+    audioTrackSwitchingMode : "smooth" | "flush" | "reload";
   };
   /** Regularly emit current playback conditions. */
   clock$ : Observable<IInitClockTick>;

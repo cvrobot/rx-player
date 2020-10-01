@@ -26,6 +26,7 @@ import { IBufferType } from "../source_buffers";
 import {
   IActivePeriodChangedEvent,
   IAdaptationChangeEvent,
+  IAddedSegmentOnAdaptationChange,
   IBitrateEstimationChangeEvent,
   ICompletedStreamEvent,
   IEndOfStreamEvent,
@@ -60,12 +61,21 @@ const EVENTS = {
   adaptationChange(
     bufferType : IBufferType,
     adaptation : Adaptation|null,
-    period : Period
+    period : Period,
+    isFirstAdaptation: boolean
   ) : IAdaptationChangeEvent {
     return { type: "adaptationChange",
              value : { type: bufferType,
                        adaptation,
-                       period } };
+                       period,
+                       isFirstAdaptation } };
+  },
+
+  addedSegmentOnAdaptationChange(
+    bufferType: IBufferType
+  ): IAddedSegmentOnAdaptationChange {
+    return { type: "addedSegmentOnAdaptationChange",
+             value: { type: bufferType } };
   },
 
   addedSegment<T>(

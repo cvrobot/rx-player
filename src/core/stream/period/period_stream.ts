@@ -119,7 +119,7 @@ export default function PeriodStream({
   // `null` when no Adaptation is chosen (e.g. no subtitles)
   const adaptation$ = new ReplaySubject<Adaptation|null>(1);
   return adaptation$.pipe(
-    switchMap((adaptation) => {
+    switchMap((adaptation, index) => {
       if (adaptation === null) {
         log.info(`Stream: Set no ${bufferType} Adaptation`, period);
         const sourceBufferStatus = sourceBuffersStore.getStatus(bufferType);
@@ -144,7 +144,10 @@ export default function PeriodStream({
         }
 
         return observableConcat<IPeriodStreamEvent>(
-          cleanBuffer$.pipe(mapTo(EVENTS.adaptationChange(bufferType, null, period))),
+          cleanBuffer$.pipe(mapTo(EVENTS.adaptationChange(bufferType,
+                                                          null,
+                                                          period,
+                                                          index === 0))),
           createEmptyStream(clock$, wantedBufferAhead$, bufferType, { period })
         );
       }
@@ -191,7 +194,10 @@ export default function PeriodStream({
         }));
 
       return observableConcat<IPeriodStreamEvent>(
-        observableOf(EVENTS.adaptationChange(bufferType, adaptation, period)),
+        observableOf(EVENTS.adaptationChange(bufferType,
+                                             adaptation,
+                                             period,
+                                             index === 0)),
         newStream$
       );
     }),

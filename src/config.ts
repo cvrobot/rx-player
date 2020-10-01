@@ -77,6 +77,20 @@ export default {
   DEFAULT_ENABLE_FAST_SWITCHING: true,
 
   /**
+   * Strategy to adopt when manually switching of audio adaptation.
+   * Can be either:
+   *    - "smooth": transitions are smooth but could be not immediate.
+   *    - "flush": The quality switch will be almost immediate, to achieve that
+   *      we will perform a very small seek in the media element to flush the
+   *      previous adaptation buffer.
+   *    - "reload": The quality switch will be immediate, to achieve that we will
+   *      reload the media source, by destroying it and rebuilding it from scratch.
+   */
+  DEFAULT_AUDIO_TRACK_SWITCHING_MODE: "smooth" as "smooth" |
+                                                  "flush" |
+                                                  "reload",
+
+  /**
    * If set to true, video through loadVideo will auto play by default
    * @type {Boolean}
    */
