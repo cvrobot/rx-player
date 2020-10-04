@@ -94,8 +94,6 @@ export interface ITransportOptions {
   referenceDateTime? : number;
   /** Allows to synchronize the server's time with the client's. */
   serverSyncInfos? : IServerSyncInfos;
-  /** Allows to adapt the switching audio logic depending on the application's choice. */
-  audioTrackSwitchingMode?: "smooth" | "flush" | "reload";
 }
 
 /**
@@ -246,6 +244,7 @@ export interface ILoadVideoOptions {
   textTrackElement? : HTMLElement;
   manualBitrateSwitchingMode? : "seamless"|"direct";
   enableFastSwitching? : boolean;
+  audioTrackSwitchingMode : "smooth" | "flush" | "reload";
 
   /* tslint:disable deprecation */
   supplementaryTextTracks? : ISupplementaryTextTrackOption[];
@@ -555,8 +554,9 @@ function parseLoadVideoOptions(
   const manifestUpdateUrl = options.transportOptions?.manifestUpdateUrl;
   const minimumManifestUpdateInterval =
     options.transportOptions?.minimumManifestUpdateInterval ?? 0;
-  let audioTrackSwitchingMode = options.transportOptions?.audioTrackSwitchingMode ??
-                                DEFAULT_AUDIO_TRACK_SWITCHING_MODE;
+  let audioTrackSwitchingMode = isNullOrUndefined(options.audioTrackSwitchingMode) 
+                                  ? DEFAULT_AUDIO_TRACK_SWITCHING_MODE
+                                  : options.audioTrackSwitchingMode;
   if (!arrayIncludes(["smooth", "flush", "reload"], audioTrackSwitchingMode)) {
     warnOnce("The `audioTrackSwitchingMode` loadVideo option must match one of the following strategy name:\n" +
              "- `smooth`\n" +
