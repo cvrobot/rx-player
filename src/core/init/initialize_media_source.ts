@@ -112,7 +112,7 @@ export interface IInitializeArguments {
      * higher-quality ones to have a faster transition.
      */
     enableFastSwitching : boolean;
-    /** Stategy when switching of audio track (smooth vs flush vs reload). */
+    /** Strategy when switching of audio track. */
     audioTrackSwitchingMode : "smooth" | "flush" | "reload";
   };
   /** Regularly emit current playback conditions. */
