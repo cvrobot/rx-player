@@ -361,7 +361,6 @@ export default function StreamOrchestrator(
     destroy$ : Observable<void>
   ) : Observable<IMultiplePeriodStreamsEvent> {
     log.info("SO: Creating new Stream for", bufferType, basePeriod);
-    let isReadyToAdaptAudioSwitchingStategy = false;
 
     // Emits the Period of the next Period Stream when it can be created.
     const createNextPeriodStream$ = new Subject<Period>();
@@ -425,30 +424,6 @@ export default function StreamOrchestrator(
         } else if (type === "active-stream") {
           // current Stream is active, destroy next Stream if created
           destroyNextStreams$.next();
-        } else if (
-          evt.type === "adaptationChange" &&
-          evt.value.type === "audio" &&
-          !evt.value.isFirstAdaptation
-          ) {
-          isReadyToAdaptAudioSwitchingStategy = true;
-        } else if (
-          evt.type === "added-segment" &&
-          evt.value.content.adaptation.type === "audio" &&
-          isReadyToAdaptAudioSwitchingStategy
-          ) {
-           const { audioTrackSwitchingMode } = options;
-           isReadyToAdaptAudioSwitchingStategy = false;
-          if (audioTrackSwitchingMode === "reload") {
-            return clock$.pipe(mergeMap((tick) => {
-                return observableMerge(
-                  observableOf(evt),
-                  observableOf(EVENTS.needsMediaSourceReload(basePeriod, tick)));
-            }));
-          } else  {
-              return observableMerge(
-                observableOf(evt),
-                observableOf(EVENTS.addedSegmentOnAdaptationChange("audio")));
-          }
         }
         return observableOf(evt);
       }),

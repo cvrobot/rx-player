@@ -114,6 +114,7 @@ export default function PeriodStream({
   wantedBufferAhead$,
 } : IPeriodStreamArguments) : Observable<IPeriodStreamEvent> {
   const { period } = content;
+  let isReadyToAdaptAudioSwitchingStrategy = false;
 
   // Emits the chosen Adaptation for the current type.
   // `null` when no Adaptation is chosen (e.g. no subtitles)
@@ -198,7 +199,18 @@ export default function PeriodStream({
                                              adaptation,
                                              period,
                                              index === 0)),
-        newStream$
+        newStream$.pipe(mergeMap((evt) => {
+          if (index !== 0 && bufferType === "audio") {
+            isReadyToAdaptAudioSwitchingStrategy = true
+            if (options.audioTrackSwitchingMode === "reload") {
+              return clock$.pipe(mergeMap((tick) => observableOf(EVENTS.needsMediaSourceReload(period, tick))))
+            } else if (evt.type === "added-segment" && isReadyToAdaptAudioSwitchingStrategy) {
+              isReadyToAdaptAudioSwitchingStrategy = false
+              return observableOf(EVENTS.needsSourceBufferFlush(bufferType))
+            }
+          }
+          return observableOf(evt);
+        }))
       );
     }),
     startWith(EVENTS.periodStreamReady(bufferType, period, adaptation$))

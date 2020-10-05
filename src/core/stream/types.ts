@@ -207,8 +207,8 @@ export interface IAdaptationChangeEvent {
   };
 }
 
-export interface IAddedSegmentOnAdaptationChange {
-  type : "addedSegmentOnAdaptationChange";
+export interface INeedSourceBufferFlush {
+  type : "needs-source-buffer-flush";
   value : {
     /** The type of buffer for which the Representation is changing. */
     type: IBufferType;
@@ -381,7 +381,7 @@ export type IPeriodStreamEvent = IPeriodStreamReadyEvent |
                                  IAdaptationStreamEvent<unknown> |
                                  INeedsMediaSourceReload |
                                  IAdaptationChangeEvent |
-                                 IAddedSegmentOnAdaptationChange;
+                                 INeedSourceBufferFlush;
 
 /** Event coming from function(s) managing multiple PeriodStreams. */
 export type IMultiplePeriodStreamsEvent = IPeriodStreamEvent |

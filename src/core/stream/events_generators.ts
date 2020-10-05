@@ -26,11 +26,11 @@ import { IBufferType } from "../source_buffers";
 import {
   IActivePeriodChangedEvent,
   IAdaptationChangeEvent,
-  IAddedSegmentOnAdaptationChange,
   IBitrateEstimationChangeEvent,
   ICompletedStreamEvent,
   IEndOfStreamEvent,
   INeedsDecipherabilityFlush,
+  INeedSourceBufferFlush,
   INeedsMediaSourceReload,
   IPeriodStreamClearedEvent,
   IPeriodStreamReadyEvent,
@@ -69,13 +69,6 @@ const EVENTS = {
                        adaptation,
                        period,
                        isFirstAdaptation } };
-  },
-
-  addedSegmentOnAdaptationChange(
-    bufferType: IBufferType
-  ): IAddedSegmentOnAdaptationChange {
-    return { type: "addedSegmentOnAdaptationChange",
-             value: { type: bufferType } };
   },
 
   addedSegment<T>(
@@ -142,6 +135,11 @@ const EVENTS = {
   ) : INeedsMediaSourceReload {
     return { type: "needs-media-source-reload",
              value: { currentTime, isPaused, period } };
+  },
+
+  needsSourceBufferFlush(type: IBufferType): INeedSourceBufferFlush {
+    return { type: "needs-source-buffer-flush",
+             value: { type } }
   },
 
   needsDecipherabilityFlush(
