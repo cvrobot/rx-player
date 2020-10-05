@@ -415,6 +415,7 @@ describe("API - parseLoadVideoOptions", () => {
   });
 
   const defaultLoadVideoOptions = {
+    audioTrackSwitchingMode: "smooth",
     autoPlay: false,
     defaultAudioTrack: undefined,
     defaultTextTrack: undefined,
@@ -767,6 +768,64 @@ describe("API - parseLoadVideoOptions", () => {
       manualBitrateSwitchingMode: "seamless",
     });
   });
+
+  it("should authorize setting a valid audioTrackSwitchingMode option", () => {
+    expect(parseLoadVideoOptions({
+      audioTrackSwitchingMode: "reload",
+      url: "foo",
+      transport: "bar",
+    })).toEqual({
+      ...defaultLoadVideoOptions,
+      url: "foo",
+      transport: "bar",
+      audioTrackSwitchingMode: "reload",
+    });
+
+    expect(parseLoadVideoOptions({
+      audioTrackSwitchingMode: "flush",
+      url: "foo",
+      transport: "bar",
+    })).toEqual({
+      ...defaultLoadVideoOptions,
+      url: "foo",
+      transport: "bar",
+      audioTrackSwitchingMode: "flush",
+    });
+
+    expect(parseLoadVideoOptions({
+      audioTrackSwitchingMode: "smooth",
+      url: "foo",
+      transport: "bar",
+    })).toEqual({
+      ...defaultLoadVideoOptions,
+      url: "foo",
+      transport: "bar",
+      audioTrackSwitchingMode: "smooth",
+    });
+  });
+
+  it("should set a 'smooth' audioTrackSwitching mode when the parameter is invalid or not specified", () => {
+    expect(parseLoadVideoOptions({
+      audioTrackSwitchingMode: "foo-bar" as any,
+      url: "foo",
+      transport: "bar",
+    })).toEqual({
+      ...defaultLoadVideoOptions,
+      url: "foo",
+      transport: "bar",
+      audioTrackSwitchingMode: "smooth",
+    });
+
+    expect(parseLoadVideoOptions({
+      url: "foo",
+      transport: "bar",
+    })).toEqual({
+      ...defaultLoadVideoOptions,
+      url: "foo",
+      transport: "bar",
+      audioTrackSwitchingMode: "smooth",
+    });
+  })
 
   it("should authorize setting a valid enableFastSwitching option", () => {
     expect(parseLoadVideoOptions({

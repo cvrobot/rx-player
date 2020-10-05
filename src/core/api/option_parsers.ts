@@ -244,7 +244,7 @@ export interface ILoadVideoOptions {
   textTrackElement? : HTMLElement;
   manualBitrateSwitchingMode? : "seamless"|"direct";
   enableFastSwitching? : boolean;
-  audioTrackSwitchingMode : "smooth" | "flush" | "reload";
+  audioTrackSwitchingMode? : "smooth" | "flush" | "reload";
 
   /* tslint:disable deprecation */
   supplementaryTextTracks? : ISupplementaryTextTrackOption[];
