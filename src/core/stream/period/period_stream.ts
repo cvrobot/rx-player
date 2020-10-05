@@ -147,8 +147,7 @@ export default function PeriodStream({
         return observableConcat<IPeriodStreamEvent>(
           cleanBuffer$.pipe(mapTo(EVENTS.adaptationChange(bufferType,
                                                           null,
-                                                          period,
-                                                          index === 0))),
+                                                          period))),
           createEmptyStream(clock$, wantedBufferAhead$, bufferType, { period })
         );
       }
@@ -197,8 +196,7 @@ export default function PeriodStream({
       return observableConcat<IPeriodStreamEvent>(
         observableOf(EVENTS.adaptationChange(bufferType,
                                              adaptation,
-                                             period,
-                                             index === 0)),
+                                             period)),
         newStream$.pipe(mergeMap((evt) => {
           if (index !== 0 && bufferType === "audio") {
             isReadyToAdaptAudioSwitchingStrategy = true

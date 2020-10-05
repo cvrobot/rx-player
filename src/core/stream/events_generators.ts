@@ -62,13 +62,11 @@ const EVENTS = {
     bufferType : IBufferType,
     adaptation : Adaptation|null,
     period : Period,
-    isFirstAdaptation: boolean
   ) : IAdaptationChangeEvent {
     return { type: "adaptationChange",
              value : { type: bufferType,
                        adaptation,
-                       period,
-                       isFirstAdaptation } };
+                       period } };
   },
 
   addedSegment<T>(

@@ -200,10 +200,6 @@ export interface IAdaptationChangeEvent {
      */
     adaptation : Adaptation |
                  null;
-    /**
-     * Tell if its the first adaptation to be chosen when loadVideo is fired.
-     */
-    isFirstAdaptation : boolean;
   };
 }
 
