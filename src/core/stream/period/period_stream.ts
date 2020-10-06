@@ -165,6 +165,7 @@ export default function PeriodStream({
       const newStream$ = clock$.pipe(
         take(1),
         mergeMap((tick) => {
+          const { audioTrackSwitchingMode } = options
           const qSourceBuffer = createOrReuseQueuedSourceBuffer(sourceBuffersStore,
                                                                 bufferType,
                                                                 adaptation,
@@ -172,7 +173,9 @@ export default function PeriodStream({
           const strategy = getAdaptationSwitchStrategy(qSourceBuffer,
                                                        period,
                                                        adaptation,
-                                                       tick);
+                                                       tick,
+                                                       audioTrackSwitchingMode,
+                                                       index === 0);
           if (strategy.type === "needs-reload") {
             return observableOf(EVENTS.needsMediaSourceReload(period, tick));
           }
@@ -200,9 +203,7 @@ export default function PeriodStream({
         newStream$.pipe(mergeMap((evt) => {
           if (index !== 0 && bufferType === "audio") {
             isReadyToAdaptAudioSwitchingStrategy = true
-            if (options.audioTrackSwitchingMode === "reload") {
-              return clock$.pipe(mergeMap((tick) => observableOf(EVENTS.needsMediaSourceReload(period, tick))))
-            } else if (evt.type === "added-segment" && isReadyToAdaptAudioSwitchingStrategy) {
+           if (evt.type === "added-segment" && isReadyToAdaptAudioSwitchingStrategy) {
               isReadyToAdaptAudioSwitchingStrategy = false
               return observableOf(EVENTS.needsSourceBufferFlush(bufferType))
             }

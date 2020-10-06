@@ -49,8 +49,18 @@ export default function getAdaptationSwitchStrategy(
   queuedSourceBuffer : QueuedSourceBuffer<unknown>,
   period : Period,
   adaptation : Adaptation,
-  clockTick : { currentTime : number; readyState : number }
+  clockTick : { currentTime : number; readyState : number },
+  audioTrackSwitchingMode: "smooth" | "flush" | "reload",
+  isFirstAdaptation: boolean,
 ) : IAdaptationSwitchStrategy {
+  if (
+    adaptation.type === "audio" &&
+    audioTrackSwitchingMode === "reload" &&
+    !isFirstAdaptation
+    ) {
+    return { type: "needs-reload", value: undefined }
+  }
+
   const buffered = queuedSourceBuffer.getBufferedRanges();
   if (buffered.length === 0) {
     return { type: "continue", value: undefined };
