@@ -34,7 +34,8 @@ const { ADAPTATION_SWITCH_BUFFER_PADDINGS } = config;
 export type IAdaptationSwitchStrategy =
   { type: "continue"; value: undefined } |
   { type: "clean-buffer"; value: Array<{ start: number; end: number }> } |
-  { type: "needs-reload"; value: undefined };
+  { type: "needs-reload"; value: undefined } |
+  { type: "needs-buffer-flush"; value: undefined };
 
 /**
  * Find out what to do when switching adaptation, based on the current
@@ -53,12 +54,12 @@ export default function getAdaptationSwitchStrategy(
   audioTrackSwitchingMode: "smooth" | "flush" | "reload",
   isFirstAdaptation: boolean
 ) : IAdaptationSwitchStrategy {
-  if (
-    adaptation.type === "audio" &&
-    audioTrackSwitchingMode === "reload" &&
-    !isFirstAdaptation
-    ) {
-    return { type: "needs-reload", value: undefined };
+  if (adaptation.type === "audio" && !isFirstAdaptation) {
+    if (audioTrackSwitchingMode === "reload") {
+      return { type: "needs-reload", value: undefined };
+    } else if (audioTrackSwitchingMode === "flush") {
+      return { type: "needs-buffer-flush", value: undefined };
+    }
   }
 
   const buffered = queuedSourceBuffer.getBufferedRanges();

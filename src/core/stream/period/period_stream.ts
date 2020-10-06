@@ -25,6 +25,7 @@ import {
 } from "rxjs";
 import {
   catchError,
+  filter,
   ignoreElements,
   map,
   mapTo,
@@ -114,7 +115,7 @@ export default function PeriodStream({
   wantedBufferAhead$,
 } : IPeriodStreamArguments) : Observable<IPeriodStreamEvent> {
   const { period } = content;
-  let isReadyToAdaptAudioSwitchingStrategy = false;
+  const needsBufferFlushing$ = new ReplaySubject<void>(1);
 
   // Emits the chosen Adaptation for the current type.
   // `null` when no Adaptation is chosen (e.g. no subtitles)
@@ -178,6 +179,8 @@ export default function PeriodStream({
                                                        index === 0);
           if (strategy.type === "needs-reload") {
             return observableOf(EVENTS.needsMediaSourceReload(period, tick));
+          } else if (strategy.type === "needs-buffer-flush") {
+            needsBufferFlushing$.next();
           }
 
           const cleanBuffer$ = strategy.type === "clean-buffer" ?
@@ -189,9 +192,19 @@ export default function PeriodStream({
           const bufferGarbageCollector$ = garbageCollectors.get(qSourceBuffer);
           const adaptationStream$ = createAdaptationStream(adaptation, qSourceBuffer);
 
+          const firstPushedSegmentOnAdaptationChange$ = needsBufferFlushing$.pipe(
+            switchMap(() => {
+              return adaptationStream$.pipe(
+                filter((value) => value.type === "added-segment"),
+                mergeMap(() => observableOf(EVENTS.needsSourceBufferFlush(bufferType))),
+                take(1));
+            })
+          );
+
           return sourceBuffersStore.waitForUsableSourceBuffers().pipe(mergeMap(() => {
             return observableConcat(cleanBuffer$,
                                     observableMerge(adaptationStream$,
+                                                    firstPushedSegmentOnAdaptationChange$,
                                                     bufferGarbageCollector$));
           }));
         }));
@@ -200,16 +213,7 @@ export default function PeriodStream({
         observableOf(EVENTS.adaptationChange(bufferType,
                                              adaptation,
                                              period)),
-        newStream$.pipe(mergeMap((evt) => {
-          if (index !== 0 && bufferType === "audio") {
-            isReadyToAdaptAudioSwitchingStrategy = true;
-           if (evt.type === "added-segment" && isReadyToAdaptAudioSwitchingStrategy) {
-              isReadyToAdaptAudioSwitchingStrategy = false;
-              return observableOf(EVENTS.needsSourceBufferFlush(bufferType));
-            }
-          }
-          return observableOf(evt);
-        }))
+        newStream$
       );
     }),
     startWith(EVENTS.periodStreamReady(bufferType, period, adaptation$))

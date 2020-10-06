@@ -90,7 +90,6 @@ const PLAYER = ({ $destroy, state }, { videoElement, textTrackElement }) => {
           offlineRetry: Infinity,
         },
         manualBitrateSwitchingMode: "direct",
-        audioTrackSwitchingMode: "reload",
         transportOptions: { checkMediaSegmentIntegrity: true },
       }, arg));
       state.set({
