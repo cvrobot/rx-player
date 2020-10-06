@@ -30,8 +30,8 @@ import {
   ICompletedStreamEvent,
   IEndOfStreamEvent,
   INeedsDecipherabilityFlush,
-  INeedSourceBufferFlush,
   INeedsMediaSourceReload,
+  INeedSourceBufferFlush,
   IPeriodStreamClearedEvent,
   IPeriodStreamReadyEvent,
   IProtectedSegmentEvent,
@@ -61,7 +61,7 @@ const EVENTS = {
   adaptationChange(
     bufferType : IBufferType,
     adaptation : Adaptation|null,
-    period : Period,
+    period : Period
   ) : IAdaptationChangeEvent {
     return { type: "adaptationChange",
              value : { type: bufferType,
@@ -137,7 +137,7 @@ const EVENTS = {
 
   needsSourceBufferFlush(type: IBufferType): INeedSourceBufferFlush {
     return { type: "needs-source-buffer-flush",
-             value: { type } }
+             value: { type } };
   },
 
   needsDecipherabilityFlush(

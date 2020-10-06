@@ -825,7 +825,7 @@ describe("API - parseLoadVideoOptions", () => {
       transport: "bar",
       audioTrackSwitchingMode: "smooth",
     });
-  })
+  });
 
   it("should authorize setting a valid enableFastSwitching option", () => {
     expect(parseLoadVideoOptions({

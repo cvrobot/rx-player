@@ -27,8 +27,8 @@ import {
   CustomSegmentLoader,
   ITransportOptions as IParsedTransportOptions,
 } from "../../transports";
-import isNullOrUndefined from "../../utils/is_null_or_undefined";
 import arrayIncludes from "../../utils/array_includes";
+import isNullOrUndefined from "../../utils/is_null_or_undefined";
 import {
   normalizeAudioTrack,
   normalizeTextTrack,
@@ -554,7 +554,7 @@ function parseLoadVideoOptions(
   const manifestUpdateUrl = options.transportOptions?.manifestUpdateUrl;
   const minimumManifestUpdateInterval =
     options.transportOptions?.minimumManifestUpdateInterval ?? 0;
-  let audioTrackSwitchingMode = isNullOrUndefined(options.audioTrackSwitchingMode) 
+  let audioTrackSwitchingMode = isNullOrUndefined(options.audioTrackSwitchingMode)
                                   ? DEFAULT_AUDIO_TRACK_SWITCHING_MODE
                                   : options.audioTrackSwitchingMode;
   if (!arrayIncludes(["smooth", "flush", "reload"], audioTrackSwitchingMode)) {
