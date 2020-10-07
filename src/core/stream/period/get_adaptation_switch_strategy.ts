@@ -51,10 +51,14 @@ export default function getAdaptationSwitchStrategy(
   period : Period,
   adaptation : Adaptation,
   clockTick : { currentTime : number; readyState : number },
-  audioTrackSwitchingMode: "smooth" | "flush" | "reload",
-  isFirstAdaptation: boolean
+  audioTrackSwitchingMode: "smooth" | "flush" | "reload"
 ) : IAdaptationSwitchStrategy {
-  if (adaptation.type === "audio" && !isFirstAdaptation) {
+  const buffered = queuedSourceBuffer.getBufferedRanges();
+  if (buffered.length === 0) {
+    return { type: "continue", value: undefined };
+  }
+
+  if (adaptation.type === "audio") {
     if (audioTrackSwitchingMode === "reload") {
       return { type: "needs-reload", value: undefined };
     } else if (audioTrackSwitchingMode === "flush") {
@@ -62,10 +66,6 @@ export default function getAdaptationSwitchStrategy(
     }
   }
 
-  const buffered = queuedSourceBuffer.getBufferedRanges();
-  if (buffered.length === 0) {
-    return { type: "continue", value: undefined };
-  }
   const bufferedRanges = convertToRanges(buffered);
   const start = period.start;
   const end = period.end == null ? Infinity :

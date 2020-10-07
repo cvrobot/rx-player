@@ -30,6 +30,7 @@ import {
   map,
   mapTo,
   mergeMap,
+  share,
   startWith,
   switchMap,
   take,
@@ -115,13 +116,14 @@ export default function PeriodStream({
   wantedBufferAhead$,
 } : IPeriodStreamArguments) : Observable<IPeriodStreamEvent> {
   const { period } = content;
+  // Emit when the adaptation switch strategy is equal to `needs-buffer-flush`
   const needsBufferFlushing$ = new ReplaySubject<void>(1);
 
   // Emits the chosen Adaptation for the current type.
   // `null` when no Adaptation is chosen (e.g. no subtitles)
   const adaptation$ = new ReplaySubject<Adaptation|null>(1);
   return adaptation$.pipe(
-    switchMap((adaptation, index) => {
+    switchMap((adaptation) => {
       if (adaptation === null) {
         log.info(`Stream: Set no ${bufferType} Adaptation`, period);
         const sourceBufferStatus = sourceBuffersStore.getStatus(bufferType);
@@ -175,8 +177,7 @@ export default function PeriodStream({
                                                        period,
                                                        adaptation,
                                                        tick,
-                                                       audioTrackSwitchingMode,
-                                                       index === 0);
+                                                       audioTrackSwitchingMode);
           if (strategy.type === "needs-reload") {
             return observableOf(EVENTS.needsMediaSourceReload(period, tick));
           } else if (strategy.type === "needs-buffer-flush") {
@@ -190,13 +191,14 @@ export default function PeriodStream({
             EMPTY;
 
           const bufferGarbageCollector$ = garbageCollectors.get(qSourceBuffer);
-          const adaptationStream$ = createAdaptationStream(adaptation, qSourceBuffer);
+          const adaptationStream$ = createAdaptationStream(adaptation,
+                                                           qSourceBuffer).pipe(share());
 
           const firstPushedSegmentOnAdaptationChange$ = needsBufferFlushing$.pipe(
             switchMap(() => {
               return adaptationStream$.pipe(
                 filter((value) => value.type === "added-segment"),
-                mergeMap(() => observableOf(EVENTS.needsSourceBufferFlush(bufferType))),
+                map(() => EVENTS.needsSourceBufferFlush(bufferType)),
                 take(1));
             })
           );
