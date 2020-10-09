@@ -26,6 +26,7 @@ import {
   mapTo,
   mergeMap,
   shareReplay,
+  tap,
 } from "rxjs/operators";
 import createSegmentLoader from "../../../core/fetchers/segment/create_segment_loader";
 import { QueuedSourceBuffer } from "../../../core/source_buffers";
@@ -49,8 +50,8 @@ const segmentLoader = createSegmentLoader(
 
 /**
  * Get current source buffer :
- * - If already created for current representation, reuse
- * - If new codecs and/or init URL, create a new one
+ * - If already created for media element, reuse
+ * - Else, create a new one
  * @param {Object} contentInfos
  * @param {HTMLVideoElement} element
  * @returns {Observable}
@@ -69,10 +70,9 @@ export function initSourceBuffer$(contentInfos: IContentInfos,
       prepareSourceBuffer(element,
                           contentInfos.representation.getMimeTypeString())
         .pipe(
-          map((videoSourceBuffer) => {
+          tap((videoSourceBuffer) => {
             currentVideoSourceBuffer?.dispose();
             _currentVideoSourceBuffers.set(element, videoSourceBuffer);
-            return videoSourceBuffer;
           }),
           catchError((err: Error) => {
             throw new Error("VideoThumbnailLoaderError: Error when creating" +
