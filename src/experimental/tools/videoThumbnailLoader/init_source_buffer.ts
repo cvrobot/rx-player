@@ -22,7 +22,6 @@ import {
 import {
   catchError,
   filter,
-  map,
   mapTo,
   mergeMap,
   shareReplay,

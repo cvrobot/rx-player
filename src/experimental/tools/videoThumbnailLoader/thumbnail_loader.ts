@@ -38,7 +38,7 @@ import {
   disposeSourceBuffer,
   initSourceBuffer$,
 } from "./init_source_buffer";
-import removeBuffer$ from "./remove_buffer";
+import removeBufferAroundTime$ from "./remove_buffer_around_time";
 import { IContentInfos, IFetchers } from "./types";
 import VideoThumbnailLoaderError from "./video_thumbnail_loader_error";
 
@@ -184,7 +184,7 @@ export default class VideoThumbnailLoader {
                         this._videoElement).pipe(
         mergeMap((videoSourceBuffer) => {
           const bufferCleaning$ =
-            removeBuffer$(this._videoElement, videoSourceBuffer, time);
+            removeBufferAroundTime$(this._videoElement, videoSourceBuffer, time);
           log.debug("VTL: Removed buffer before appending segments.", time);
 
           const segmentLoader = createSegmentLoader(
