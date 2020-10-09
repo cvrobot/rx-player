@@ -180,6 +180,7 @@ export default class VideoThumbnailLoader {
     );
 
     const jobPromise = observableRace(
+      abortError$,
       initSourceBuffer$(contentInfos,
                         this._videoElement).pipe(
         mergeMap((videoSourceBuffer) => {
@@ -198,7 +199,7 @@ export default class VideoThumbnailLoader {
 
           const segmentLoading$ = segmentLoader({
             manifest: contentInfos.manifest,
-            period: contentInfos.manifest.periods[0],
+            period: contentInfos.period,
             adaptation: contentInfos.adaptation,
             representation: contentInfos.representation,
             segment,
@@ -250,14 +251,19 @@ export default class VideoThumbnailLoader {
             })
           );
         }),
-        catchError((err: Error | { message?: string; toString(): string }) => {
-          const newError =
-            new VideoThumbnailLoaderError("LOADING_ERROR",
-                                          (err.message ?? err.toString()));
-          throw newError;
+        catchError((err: unknown) => {
+          let message = "Unknown error.";
+          if ((err as { message?: string; toString(): string }).message !== undefined ||
+            /* tslint:disable no-unbound-method */
+              typeof (err as { message?: string; toString(): string }).toString === "function") {
+            /* tslint:enable no-unbound-method */
+            /* tslint:disable no-unsafe-any */
+            message = (err as any).message ?? (err as any).toString();
+            /* tslint:enable no-unsafe-any */
+          }
+          throw new VideoThumbnailLoaderError("LOADING_ERROR", message);
         })
-      ),
-      abortError$
+      )
     ).pipe(take(1)).toPromise(PPromise)
       .finally(() => {
         this._currentJob = undefined;
