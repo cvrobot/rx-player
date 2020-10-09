@@ -3,20 +3,19 @@
 
 ## Overview ####################################################################
 
-The VideoThumbnailLoader is a tool that can help using a video track
-(Representation) as a substitue of a manifest embedded thumbnail track.
+The VideoThumbnailLoader is a tool that can help using a video track as a
+substitute of a manifest embedded thumbnail track.
 
 The goal is to make a thumbnail out of HTML5 video element, by :
 - Managing the loading / appending of resources from a given track
 (video segments).
 - Exploiting the Media Source Extension API to make it invisible to user.
 
-The tool will need the loaded manifest video adaptation to contain trickmode
-tracks. These kind of adaptation exists in MPEG-DASH and HLS, and contains
-lightweight video tracks, most of the time including one unique frame for each
-video segments. As video segments from trickmode tracks may be quicker to load
-and easier to decode, they are preferred over standard video tracks for creating
-thumbnails.
+The tool will need the loaded manifest to contain trickmode tracks. These kind
+of adaptation exists in MPEG-DASH and HLS, and contains lightweight video tracks,
+most of the time including one unique frame for each video segments. As video
+segments from trickmode tracks may be quicker to load and easier to decode, they
+are preferred over standard video tracks for creating thumbnails.
 
 ## How to use it ###############################################################
 
@@ -43,6 +42,8 @@ const videoThumbnailLoader = new VideoThumbnailLoader(
   player
 );
 
+// Ask for the video thumbnail loader to fetch the thumbnail
+// that should be displayed at presentation time = 200.
 videoThumbnailLoader.setTime(200);
 ```
 
@@ -53,9 +54,8 @@ videoThumbnailLoader.setTime(200);
 _arguments_:
   - _fetcher_ (``Object``): Imported fetcher from VideoThumbnailLoader package.
 
-To be able to load and parse segments from a specific streaming format, you may
-import the corresponding fetcher from the VTL package, and add it to the
-instance through this function.
+To be able to load and parse segments from a specific streaming format, you must
+import the corresponding fetcher and add it to the related instance :
 
 #### Example
 
@@ -78,10 +78,11 @@ _arguments_:
 
 _return value_: ``Promise``
 
-From a given time, load video segments, and append to video element.
-The loader find the period for the given time. In this period, it chooses
-the first video adaptation. If a trick mode track is present on it, choose it.
-Otherwise, select the first representation.
+Display thumbnail for the corresponding time (in seconds).
+
+Note: this tool rely on "trickmode" tracks to be present for the corresponding
+content at the corresponding time. If this track is not present, select the
+first representation of the corresponding content.
 
 #### Return value
 
