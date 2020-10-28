@@ -131,6 +131,14 @@ export default class Manifest extends EventEmitter<IManifestEvents> {
   public readonly id : string;
 
   /**
+   * Type of transport used by this Manifest (e.g. `"dash"` or `"smooth"`).
+   *
+   * TODO This should never be needed as this structure is transport-agnostic.
+   * But it is specified in the Manifest API. Deprecate?
+   */
+  public transport : string;
+
+  /**
    * List every Period in that Manifest chronologically (from start to end).
    * A Period contains information about the content available for a specific
    * period of time.
@@ -297,6 +305,7 @@ export default class Manifest extends EventEmitter<IManifestEvents> {
     this.parsingErrors = [];
     this.id = generateNewManifestId();
     this.expired = parsedManifest.expired ?? null;
+    this.transport = parsedManifest.transportType;
     this.clockOffset = parsedManifest.clockOffset;
 
     this.periods = parsedManifest.periods.map((parsedPeriod) => {
@@ -665,6 +674,7 @@ export default class Manifest extends EventEmitter<IManifestEvents> {
     this.lifetime = newManifest.lifetime;
     this.parsingErrors = newManifest.parsingErrors;
     this.suggestedPresentationDelay = newManifest.suggestedPresentationDelay;
+    this.transport = newManifest.transport;
 
     if (updateType === MANIFEST_UPDATE_TYPE.Full) {
       this._timeBounds = newManifest._timeBounds;
